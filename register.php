@@ -19,15 +19,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Validation
     if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
-        $error_message = 'Please fill in all fields.';
+        $error_message = 'Por favor, preencha todos os campos.';
     } elseif (!validateEmail($email)) {
-        $error_message = 'Please enter a valid email address.';
+        $error_message = 'Por favor, insira um endereço de e-mail válido.';
     } elseif (strlen($username) < 3) {
-        $error_message = 'Username must be at least 3 characters long.';
+        $error_message = 'O nome de usuário deve ter pelo menos 3 caracteres.';
     } elseif (strlen($password) < 6) {
-        $error_message = 'Password must be at least 6 characters long.';
+        $error_message = 'A senha deve ter pelo menos 6 caracteres.';
     } elseif ($password !== $confirm_password) {
-        $error_message = 'Passwords do not match.';
+        $error_message = 'As senhas não coincidem.';
     } else {
         try {
             $db = getDatabase();
@@ -38,33 +38,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->execute([$username, $email]);
             
             if ($stmt->fetch()) {
-                $error_message = 'Username or email already exists.';
+                $error_message = 'Nome de usuário ou e-mail já existe.';
             } else {
                 // Create new user
                 $password_hash = hashPassword($password);
                 $stmt = $conn->prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)");
                 
                 if ($stmt->execute([$username, $email, $password_hash])) {
-                    $_SESSION['registration_success'] = 'Registration successful! Please log in.';
+                    $_SESSION['registration_success'] = 'Registro realizado com sucesso! Faça o login.';
                     header('Location: login.php');
                     exit();
                 } else {
-                    $error_message = 'Registration failed. Please try again.';
+                    $error_message = 'Falha no registro. Tente novamente.';
                 }
             }
         } catch (Exception $e) {
             error_log("Registration error: " . $e->getMessage());
-            $error_message = 'An error occurred. Please try again.';
+            $error_message = 'Ocorreu um erro. Tente novamente.';
         }
     }
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Pokémon Management System</title>
+    <title>Registrar - Pokémon Management System</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="auth-page">
@@ -72,8 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="auth-container">
             <div class="auth-header">
                 <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/151.png" alt="Mew" class="auth-pokemon">
-                <h1>Join the Adventure!</h1>
-                <p>Create your account to start building your Pokémon collection</p>
+                <h1>Junte-se à Aventura!</h1>
+                <p>Crie sua conta para começar a construir sua coleção de Pokémon</p>
             </div>
 
             <?php if (!empty($error_message)): ?>
@@ -84,9 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <form class="auth-form" method="POST" action="">
                 <div class="form-group">
-                    <label for="username">Username</label>
+                    <label for="username">Nome de Usuário</label>
                     <input type="text" id="username" name="username" value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" required>
-                    <small class="form-help">At least 3 characters</small>
+                    <small class="form-help">Pelo menos 3 caracteres</small>
                 </div>
 
                 <div class="form-group">
@@ -95,22 +95,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="password">Senha</label>
                     <input type="password" id="password" name="password" required>
-                    <small class="form-help">At least 6 characters</small>
+                    <small class="form-help">Pelo menos 6 caracteres</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
+                    <label for="confirm_password">Confirmar Senha</label>
                     <input type="password" id="confirm_password" name="confirm_password" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-full">Register</button>
+                <button type="submit" class="btn btn-primary btn-full">Registrar</button>
             </form>
 
             <div class="auth-links">
-                <p>Already have an account? <a href="login.php">Login here</a></p>
-                <p><a href="index.php">← Back to Home</a></p>
+                <p>Já tem uma conta? <a href="login.php">Entre aqui</a></p>
+                <p><a href="index.php">← Voltar ao Início</a></p>
             </div>
         </div>
     </div>
