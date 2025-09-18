@@ -31,11 +31,11 @@ try {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Pokémon Management System</title>
+    <title>Painel - Pokémon Management System</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="dashboard-page">
@@ -46,33 +46,33 @@ try {
                 <span>PokéManager</span>
             </div>
             <div class="nav-user">
-                <span>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
-                <a href="logout.php" class="btn btn-outline">Logout</a>
+                <span>Bem-vindo, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+                <a href="logout.php" class="btn btn-outline">Sair</a>
             </div>
         </div>
     </nav>
 
     <div class="container dashboard-container">
         <header class="dashboard-header">
-            <h1>Your Pokémon Collection</h1>
+            <h1>Sua Coleção de Pokémon</h1>
             <div class="stats">
                 <div class="stat-card">
                     <div class="stat-number"><?php echo $total_pokemon; ?></div>
-                    <div class="stat-label">Pokémon Caught</div>
+                    <div class="stat-label">Pokémon Capturados</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number"><?php echo count(array_unique(array_column($pokemon_collection, 'pokemon_type1'))); ?></div>
-                    <div class="stat-label">Different Types</div>
+                    <div class="stat-label">Tipos Diferentes</div>
                 </div>
             </div>
         </header>
 
         <div class="dashboard-actions">
             <button id="add-pokemon-btn" class="btn btn-primary">
-                <span>+</span> Add New Pokémon
+                <span>+</span> Adicionar Novo Pokémon
             </button>
             <div class="search-filter">
-                <input type="text" id="search-pokemon" placeholder="Search your collection...">
+                <input type="text" id="search-pokemon" placeholder="Buscar na sua coleção...">
             </div>
         </div>
 
@@ -80,15 +80,15 @@ try {
         <div id="add-pokemon-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Add Pokémon to Collection</h2>
+                    <h2>Adicionar Pokémon à Coleção</h2>
                     <span class="close">&times;</span>
                 </div>
                 <div class="modal-body">
                     <form id="search-form">
                         <div class="form-group">
-                            <label for="pokemon-search">Search Pokémon (name or ID):</label>
-                            <input type="text" id="pokemon-search" placeholder="e.g., pikachu or 25">
-                            <button type="submit" class="btn btn-secondary">Search</button>
+                            <label for="pokemon-search">Buscar Pokémon (nome ou ID):</label>
+                            <input type="text" id="pokemon-search" placeholder="ex: pikachu ou 25">
+                            <button type="submit" class="btn btn-secondary">Buscar</button>
                         </div>
                     </form>
                     
@@ -110,21 +110,21 @@ try {
                         <input type="hidden" id="pokemon-abilities" name="pokemon_abilities">
                         
                         <div class="form-group">
-                            <label for="nickname">Nickname (optional):</label>
+                            <label for="nickname">Apelido (opcional):</label>
                             <input type="text" id="nickname" name="nickname">
                         </div>
                         
                         <div class="form-group">
-                            <label for="level_caught">Level Caught:</label>
+                            <label for="level_caught">Nível Capturado:</label>
                             <input type="number" id="level_caught" name="level_caught" min="1" max="100" value="1">
                         </div>
                         
                         <div class="form-group">
-                            <label for="notes">Notes (optional):</label>
+                            <label for="notes">Anotações (opcional):</label>
                             <textarea id="notes" name="notes" rows="3"></textarea>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary">Add to Collection</button>
+                        <button type="submit" class="btn btn-primary">Adicionar à Coleção</button>
                     </form>
                 </div>
             </div>
@@ -134,7 +134,7 @@ try {
         <div id="edit-pokemon-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>Edit Pokémon</h2>
+                    <h2>Editar Pokémon</h2>
                     <span class="close">&times;</span>
                 </div>
                 <div class="modal-body">
@@ -142,23 +142,23 @@ try {
                         <input type="hidden" id="edit-id" name="id">
                         
                         <div class="form-group">
-                            <label for="edit-nickname">Nickname:</label>
+                            <label for="edit-nickname">Apelido:</label>
                             <input type="text" id="edit-nickname" name="nickname">
                         </div>
                         
                         <div class="form-group">
-                            <label for="edit-level">Level:</label>
+                            <label for="edit-level">Nível:</label>
                             <input type="number" id="edit-level" name="level_caught" min="1" max="100">
                         </div>
                         
                         <div class="form-group">
-                            <label for="edit-notes">Notes:</label>
+                            <label for="edit-notes">Anotações:</label>
                             <textarea id="edit-notes" name="notes" rows="3"></textarea>
                         </div>
                         
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Update</button>
-                            <button type="button" id="delete-pokemon-btn" class="btn btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-primary">Atualizar</button>
+                            <button type="button" id="delete-pokemon-btn" class="btn btn-danger">Excluir</button>
                         </div>
                     </form>
                 </div>
@@ -169,8 +169,8 @@ try {
             <?php if (empty($pokemon_collection)): ?>
                 <div class="empty-collection">
                     <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/54.png" alt="Psyduck" class="empty-pokemon">
-                    <h3>Your collection is empty!</h3>
-                    <p>Start by adding your first Pokémon to your collection.</p>
+                    <h3>Sua coleção está vazia!</h3>
+                    <p>Comece adicionando seu primeiro Pokémon à coleção.</p>
                 </div>
             <?php else: ?>
                 <div class="pokemon-grid" id="pokemon-grid">

@@ -130,7 +130,7 @@ function initializeFormSubmissions() {
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.textContent = 'Loading...';
+                submitBtn.textContent = 'Carregando...';
                 
                 setTimeout(() => {
                     submitBtn.disabled = false;
@@ -153,7 +153,7 @@ async function searchPokemon() {
     }
     
     try {
-        showLoading('Searching Pokémon...');
+        showLoading('Buscando Pokémon...');
         
         const response = await fetch(`pokemon_operations.php?action=search_pokeapi&query=${encodeURIComponent(query)}`);
         const data = await response.json();
@@ -189,7 +189,7 @@ async function searchPokemon() {
         }
     } catch (error) {
         hideLoading();
-        showAlert('An error occurred while searching. Please try again.', 'error');
+        showAlert('Ocorreu um erro durante a busca. Tente novamente.', 'error');
         console.error('Search error:', error);
     }
 }
@@ -216,7 +216,7 @@ async function addPokemon() {
             showAlert(data.message, 'error');
         }
     } catch (error) {
-        showAlert('An error occurred. Please try again.', 'error');
+        showAlert('Ocorreu um erro. Tente novamente.', 'error');
         console.error('Add Pokemon error:', error);
     }
 }
@@ -226,7 +226,7 @@ async function openEditModal(pokemonId) {
     const editModal = document.getElementById('edit-pokemon-modal');
     
     try {
-        showLoading('Loading Pokémon data...');
+        showLoading('Carregando dados do Pokémon...');
         
         const formData = new FormData();
         formData.append('action', 'get');
@@ -255,7 +255,7 @@ async function openEditModal(pokemonId) {
         }
     } catch (error) {
         hideLoading();
-        showAlert('An error occurred. Please try again.', 'error');
+        showAlert('Ocorreu um erro. Tente novamente.', 'error');
         console.error('Load Pokemon error:', error);
     }
 }
@@ -282,7 +282,7 @@ async function editPokemon() {
             showAlert(data.message, 'error');
         }
     } catch (error) {
-        showAlert('An error occurred. Please try again.', 'error');
+        showAlert('Ocorreu um erro. Tente novamente.', 'error');
         console.error('Edit Pokemon error:', error);
     }
 }
@@ -312,7 +312,7 @@ async function deletePokemon() {
             showAlert(data.message, 'error');
         }
     } catch (error) {
-        showAlert('An error occurred. Please try again.', 'error');
+        showAlert('Ocorreu um erro. Tente novamente.', 'error');
         console.error('Delete Pokemon error:', error);
     }
 }
@@ -355,7 +355,7 @@ function showAlert(message, type = 'info') {
 }
 
 // Show loading indicator
-function showLoading(message = 'Loading...') {
+function showLoading(message = 'Carregando...') {
     // Remove existing loading
     const existingLoading = document.querySelectorAll('.loading-indicator');
     existingLoading.forEach(loading => loading.remove());

@@ -32,7 +32,7 @@ try {
                 $stmt->execute([$_SESSION['user_id'], $pokemon_id]);
                 
                 if ($stmt->fetch()) {
-                    $response['message'] = 'This Pokémon is already in your collection!';
+                    $response['message'] = 'Este Pokémon já está na sua coleção!';
                 } else {
                     $stmt = $conn->prepare("
                         INSERT INTO pokemon_collection 
@@ -42,9 +42,9 @@ try {
                     
                     if ($stmt->execute([$_SESSION['user_id'], $pokemon_id, $pokemon_name, $pokemon_type1, $pokemon_type2, $pokemon_sprite, $pokemon_abilities, $nickname, $level_caught, $notes])) {
                         $response['success'] = true;
-                        $response['message'] = 'Pokémon added to collection successfully!';
+                        $response['message'] = 'Pokémon adicionado à coleção com sucesso!';
                     } else {
-                        $response['message'] = 'Failed to add Pokémon to collection.';
+                        $response['message'] = 'Falha ao adicionar Pokémon à coleção.';
                     }
                 }
                 break;
@@ -63,9 +63,9 @@ try {
                 
                 if ($stmt->execute([$nickname, $level_caught, $notes, $id, $_SESSION['user_id']])) {
                     $response['success'] = true;
-                    $response['message'] = 'Pokémon updated successfully!';
+                    $response['message'] = 'Pokémon atualizado com sucesso!';
                 } else {
-                    $response['message'] = 'Failed to update Pokémon.';
+                    $response['message'] = 'Falha ao atualizar Pokémon.';
                 }
                 break;
                 
@@ -76,9 +76,9 @@ try {
                 
                 if ($stmt->execute([$id, $_SESSION['user_id']])) {
                     $response['success'] = true;
-                    $response['message'] = 'Pokémon removed from collection.';
+                    $response['message'] = 'Pokémon removido da coleção.';
                 } else {
-                    $response['message'] = 'Failed to remove Pokémon.';
+                    $response['message'] = 'Falha ao remover Pokémon.';
                 }
                 break;
                 
@@ -93,12 +93,12 @@ try {
                     $response['success'] = true;
                     $response['pokemon'] = $pokemon;
                 } else {
-                    $response['message'] = 'Pokémon not found.';
+                    $response['message'] = 'Pokémon não encontrado.';
                 }
                 break;
                 
             default:
-                $response['message'] = 'Invalid action.';
+                $response['message'] = 'Ação inválida.';
                 break;
         }
     } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -108,7 +108,7 @@ try {
             case 'search_pokeapi':
                 $query = sanitizeInput($_GET['query']);
                 if (empty($query)) {
-                    $response['message'] = 'Search query is required.';
+                    $response['message'] = 'Consulta de busca é obrigatória.';
                     break;
                 }
                 
@@ -124,7 +124,7 @@ try {
                 $pokemon_data = @file_get_contents($pokeapi_url, false, $context);
                 
                 if ($pokemon_data === false) {
-                    $response['message'] = 'Pokémon not found in PokéAPI.';
+                    $response['message'] = 'Pokémon não encontrado na PokéAPI.';
                 } else {
                     $pokemon_json = json_decode($pokemon_data, true);
                     
@@ -145,22 +145,22 @@ try {
                         $response['success'] = true;
                         $response['pokemon'] = $pokemon_info;
                     } else {
-                        $response['message'] = 'Invalid response from PokéAPI.';
+                        $response['message'] = 'Resposta inválida da PokéAPI.';
                     }
                 }
                 break;
                 
             default:
-                $response['message'] = 'Invalid action.';
+                $response['message'] = 'Ação inválida.';
                 break;
         }
     } else {
-        $response['message'] = 'Invalid request method.';
+        $response['message'] = 'Método de requisição inválido.';
     }
     
 } catch (Exception $e) {
     error_log("Pokemon operations error: " . $e->getMessage());
-    $response['message'] = 'An error occurred. Please try again.';
+    $response['message'] = 'Ocorreu um erro. Tente novamente.';
 }
 
 echo json_encode($response);
