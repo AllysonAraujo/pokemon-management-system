@@ -65,7 +65,7 @@ if (isLoggedIn()) {
         </main>
 
         <footer class="footer">
-            <p>&copy; 2024 Pokémon Management System. Feito com ❤️ para treinadores do mundo todo.</p>
+            <p>&copy; 2025 Pokémon Management System. Feito com ❤️ para treinadores do mundo todo.</p>
             <p>Dados de Pokémon fornecidos por <a href="https://pokeapi.co/" target="_blank">PokéAPI</a></p>
         </footer>
     </div>

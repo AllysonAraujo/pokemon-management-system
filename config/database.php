@@ -7,7 +7,7 @@
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'pokemon_management');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', 'root');
 define('DB_CHARSET', 'utf8mb4');
 
 /**
@@ -71,15 +71,22 @@ function startSecureSession() {
     if (session_status() == PHP_SESSION_NONE) {
         // Configure session for security
         ini_set('session.cookie_httponly', 1);
-        ini_set('session.cookie_secure', 1);
+        // Only set secure cookies if we're actually using HTTPS
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+            ini_set('session.cookie_secure', 1);
+        }
         ini_set('session.use_only_cookies', 1);
         
         session_start();
+        
+        // Debug session start
+        error_log("Sessão iniciada - ID: " . session_id() . ", User ID: " . ($_SESSION['user_id'] ?? 'não definido'));
         
         // Regenerate session ID for security
         if (!isset($_SESSION['initiated'])) {
             session_regenerate_id(true);
             $_SESSION['initiated'] = true;
+            error_log("Session ID regenerado: " . session_id());
         }
     }
 }

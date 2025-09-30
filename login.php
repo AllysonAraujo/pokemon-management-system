@@ -33,9 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['email'] = $user['email'];
                 
+                // Debug: Log successful login
+                error_log("Login bem-sucedido - User ID: " . $user['id'] . ", Username: " . $user['username'] . ", Session ID: " . session_id());
+                
                 header('Location: dashboard.php');
                 exit();
             } else {
+                error_log("Login falhou - Username: " . $username . ", User encontrado: " . ($user ? 'SIM' : 'NÃO'));
                 $error_message = 'Nome de usuário ou senha inválidos.';
             }
         } catch (Exception $e) {
@@ -80,15 +84,15 @@ if (isset($_SESSION['registration_success'])) {
                 </div>
             <?php endif; ?>
 
-            <form class="auth-form" method="POST" action="">
+            <form class="auth-form" method="POST" action="" autocomplete="off">
                 <div class="form-group">
                     <label for="username">Nome de Usuário</label>
-                    <input type="text" id="username" name="username" value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" required>
+                    <input type="text" id="username" name="username" autocomplete="off" value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Senha</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password" autocomplete="off" required>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full">Entrar</button>

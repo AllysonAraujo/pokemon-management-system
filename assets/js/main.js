@@ -50,9 +50,15 @@ function initializeModals() {
     const editButtons = document.querySelectorAll('.edit-pokemon-btn');
     const editModal = document.getElementById('edit-pokemon-modal');
     
-    editButtons.forEach(button => {
+    console.log('Inicializando botões de editar. Encontrados:', editButtons.length, 'botões');
+    
+    editButtons.forEach((button, index) => {
+        const pokemonId = button.dataset.id;
+        console.log(`Botão ${index + 1}: ID = "${pokemonId}"`);
+        
         button.addEventListener('click', function() {
             const pokemonId = this.dataset.id;
+            console.log('Clicou em editar Pokémon, ID:', pokemonId);
             openEditModal(pokemonId);
         });
     });
@@ -91,7 +97,7 @@ function initializePokemonOperations() {
     const deleteBtn = document.getElementById('delete-pokemon-btn');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to remove this Pokémon from your collection?')) {
+            if (confirm('Tem certeza de que deseja remover este Pokémon da sua coleção?')) {
                 deletePokemon();
             }
         });
@@ -148,7 +154,7 @@ async function searchPokemon() {
     const addForm = document.getElementById('add-pokemon-form');
     
     if (!query) {
-        showAlert('Please enter a Pokémon name or ID', 'error');
+        showAlert('Por favor, digite o nome ou ID de um Pokémon', 'error');
         return;
     }
     
@@ -200,20 +206,42 @@ async function addPokemon() {
     formData.append('action', 'add');
     
     try {
+        console.log('Enviando dados para adicionar Pokémon:', Object.fromEntries(formData));
+        
         const response = await fetch('pokemon_operations.php', {
             method: 'POST',
             body: formData
         });
         
-        const data = await response.json();
+        console.log('Response status:', response.status);
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+        
+        const data = JSON.parse(responseText);
+        console.log('Parsed response:', data);
         
         if (data.success) {
             showAlert(data.message, 'success');
             document.getElementById('add-pokemon-modal').style.display = 'none';
-            // Refresh the page to show the new Pokemon
-            setTimeout(() => location.reload(), 1500);
+            
+            console.log('Pokémon adicionado com sucesso! ID retornado:', data.pokemon_id);
+            
+            // Try dynamic update first, then fallback to reload
+            const dynamicUpdateSuccess = await addPokemonToDOMDynamically(formData, data.pokemon_id);
+            
+            if (!dynamicUpdateSuccess) {
+                console.log('Atualização dinâmica falhou, recarregando página...');
+                // Force reload without cache
+                setTimeout(() => {
+                    console.log('Recarregando página...');
+                    window.location.reload(true);
+                }, 2000);
+            } else {
+                console.log('Pokémon adicionado dinamicamente à página!');
+            }
         } else {
             showAlert(data.message, 'error');
+            console.error('Erro do servidor:', data.message);
         }
     } catch (error) {
         showAlert('Ocorreu um erro. Tente novamente.', 'error');
@@ -221,9 +249,141 @@ async function addPokemon() {
     }
 }
 
+// Add Pokemon to DOM dynamically without reload
+async function addPokemonToDOMDynamically(formData, realPokemonId) {
+    try {
+        const pokemonGrid = document.getElementById('pokemon-grid');
+        const emptyCollection = document.querySelector('.empty-collection');
+        
+        if (!pokemonGrid && !emptyCollection) {
+            console.log('Não foi possível encontrar elementos necessários no DOM');
+            return false;
+        }
+        
+        // Extract data from form
+        const pokemonData = {
+            pokemon_id: formData.get('pokemon_id'),
+            pokemon_name: formData.get('pokemon_name'),
+            pokemon_type1: formData.get('pokemon_type1'),
+            pokemon_type2: formData.get('pokemon_type2'),
+            pokemon_sprite: formData.get('pokemon_sprite'),
+            nickname: formData.get('nickname'),
+            level_caught: formData.get('level_caught'),
+            notes: formData.get('notes'),
+            date_caught: new Date().toISOString().split('T')[0] // Today's date
+        };
+        
+        // If empty collection, replace with grid
+        if (emptyCollection) {
+            emptyCollection.style.display = 'none';
+            
+            // Create pokemon grid if it doesn't exist
+            if (!pokemonGrid) {
+                const newGrid = document.createElement('div');
+                newGrid.className = 'pokemon-grid';
+                newGrid.id = 'pokemon-grid';
+                
+                const main = document.querySelector('.pokemon-collection');
+                main.appendChild(newGrid);
+            }
+        }
+        
+        // Create new Pokemon card
+        const newCard = createPokemonCard(pokemonData, realPokemonId);
+        
+        // Add to grid (at the beginning since it's ordered by created_at DESC)
+        const grid = document.getElementById('pokemon-grid');
+        grid.insertAdjacentHTML('afterbegin', newCard);
+        
+        // Update stats
+        updateStatsAfterAdd(pokemonData);
+        
+        // Re-initialize search functionality for new card
+        initializeSearch();
+        
+        // Re-initialize edit buttons for new card
+        const newEditButton = grid.querySelector('.pokemon-card:first-child .edit-pokemon-btn');
+        if (newEditButton && realPokemonId) {
+            console.log('Configurando botão de editar com ID:', realPokemonId);
+            newEditButton.addEventListener('click', function() {
+                const pokemonId = this.dataset.id;
+                console.log('Clicou em editar, Pokemon ID:', pokemonId);
+                openEditModal(pokemonId);
+            });
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Erro na atualização dinâmica:', error);
+        return false;
+    }
+}
+
+// Create Pokemon card HTML
+function createPokemonCard(pokemon, realPokemonId = null) {
+    const displayName = pokemon.nickname || capitalizeFirstLetter(pokemon.pokemon_name);
+    const type2HTML = pokemon.pokemon_type2 ? 
+        `<span class="type type-${pokemon.pokemon_type2.toLowerCase()}">${capitalizeFirstLetter(pokemon.pokemon_type2)}</span>` : '';
+    const nicknameHTML = pokemon.nickname ? 
+        `<p class="pokemon-species">${capitalizeFirstLetter(pokemon.pokemon_name)}</p>` : '';
+    
+    // Add notes if they exist
+    const notesHTML = pokemon.notes && pokemon.notes.trim() !== '' ? 
+        `<div class="pokemon-notes"><strong>Anotações:</strong> ${pokemon.notes}</div>` : '';
+    
+    // Use the real Pokemon ID from database if provided, otherwise fallback to 'new'
+    const editButtonId = realPokemonId || 'new';
+    
+    return `
+        <div class="pokemon-card" data-pokemon-id="${pokemon.pokemon_id}" data-name="${pokemon.pokemon_name.toLowerCase()}">
+            <div class="pokemon-image">
+                <img src="${pokemon.pokemon_sprite}" alt="${pokemon.pokemon_name}">
+            </div>
+            <div class="pokemon-info">
+                <h3 class="pokemon-name">${displayName}</h3>
+                ${nicknameHTML}
+                <div class="pokemon-types">
+                    <span class="type type-${pokemon.pokemon_type1.toLowerCase()}">${capitalizeFirstLetter(pokemon.pokemon_type1)}</span>
+                    ${type2HTML}
+                </div>
+                <div class="pokemon-level">Level ${pokemon.level_caught}</div>
+                <div class="pokemon-date">Capturado em: ${new Date(pokemon.date_caught).toLocaleDateString('pt-BR')}</div>
+                ${notesHTML}
+            </div>
+            <div class="pokemon-actions">
+                <button class="btn btn-sm btn-outline edit-pokemon-btn" data-id="${editButtonId}">Editar</button>
+            </div>
+        </div>
+    `;
+}
+
+// Update stats after adding Pokemon
+function updateStatsAfterAdd(pokemon) {
+    try {
+        const totalStat = document.querySelector('.stat-card:first-child .stat-number');
+        if (totalStat) {
+            const currentTotal = parseInt(totalStat.textContent) || 0;
+            totalStat.textContent = currentTotal + 1;
+        }
+        
+        // Note: Type counting would require more complex logic to track unique types
+        // For now, we'll just update the total count
+    } catch (error) {
+        console.error('Erro ao atualizar estatísticas:', error);
+    }
+}
+
 // Open edit modal
 async function openEditModal(pokemonId) {
     const editModal = document.getElementById('edit-pokemon-modal');
+    
+    console.log('OpenEditModal chamado com ID:', pokemonId);
+    
+    if (!pokemonId || pokemonId === 'new') {
+        showAlert('ID do Pokémon inválido. Recarregue a página e tente novamente.', 'error');
+        console.error('ID inválido para edição:', pokemonId);
+        return;
+    }
     
     try {
         showLoading('Carregando dados do Pokémon...');
@@ -232,12 +392,19 @@ async function openEditModal(pokemonId) {
         formData.append('action', 'get');
         formData.append('id', pokemonId);
         
+        console.log('Enviando requisição para buscar Pokémon ID:', pokemonId);
+        
         const response = await fetch('pokemon_operations.php', {
             method: 'POST',
             body: formData
         });
         
-        const data = await response.json();
+        console.log('Response status:', response.status);
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+        
+        const data = JSON.parse(responseText);
+        console.log('Dados recebidos:', data);
         
         hideLoading();
         
@@ -249,9 +416,11 @@ async function openEditModal(pokemonId) {
             document.getElementById('edit-level').value = pokemon.level_caught;
             document.getElementById('edit-notes').value = pokemon.notes || '';
             
+            console.log('Modal preenchido com dados do Pokémon:', pokemon.id);
             editModal.style.display = 'block';
         } else {
             showAlert(data.message, 'error');
+            console.error('Erro do servidor:', data.message);
         }
     } catch (error) {
         hideLoading();
@@ -265,21 +434,42 @@ async function editPokemon() {
     const formData = new FormData(document.getElementById('edit-pokemon-form'));
     formData.append('action', 'edit');
     
+    console.log('Editando Pokémon com dados:', Object.fromEntries(formData));
+    
     try {
         const response = await fetch('pokemon_operations.php', {
             method: 'POST',
             body: formData
         });
         
-        const data = await response.json();
+        console.log('Response status:', response.status);
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+        
+        const data = JSON.parse(responseText);
+        console.log('Parsed response:', data);
         
         if (data.success) {
             showAlert(data.message, 'success');
             document.getElementById('edit-pokemon-modal').style.display = 'none';
-            // Refresh the page to show updated Pokemon
-            setTimeout(() => location.reload(), 1500);
+            
+            console.log('Pokémon editado com sucesso! ID:', data.pokemon_id);
+            
+            // Try dynamic update first, then fallback to reload
+            const dynamicUpdateSuccess = await updatePokemonInDOMDynamically(formData, data.pokemon_id);
+            
+            if (!dynamicUpdateSuccess) {
+                console.log('Atualização dinâmica falhou, recarregando página...');
+                setTimeout(() => {
+                    console.log('Recarregando página...');
+                    window.location.reload(true);
+                }, 2000);
+            } else {
+                console.log('Pokémon atualizado dinamicamente na página!');
+            }
         } else {
             showAlert(data.message, 'error');
+            console.error('Erro do servidor:', data.message);
         }
     } catch (error) {
         showAlert('Ocorreu um erro. Tente novamente.', 'error');
@@ -287,9 +477,110 @@ async function editPokemon() {
     }
 }
 
+// Update Pokemon in DOM dynamically after edit
+async function updatePokemonInDOMDynamically(formData, pokemonId) {
+    try {
+        console.log('Tentando atualizar Pokémon no DOM. ID:', pokemonId);
+        
+        // Find the Pokemon card by the data-id in the edit button
+        const pokemonCards = document.querySelectorAll('.pokemon-card');
+        let targetCard = null;
+        
+        pokemonCards.forEach(card => {
+            const editButton = card.querySelector('.edit-pokemon-btn');
+            if (editButton && editButton.dataset.id === pokemonId.toString()) {
+                targetCard = card;
+                console.log('Card encontrado para atualização:', card);
+            }
+        });
+        
+        if (!targetCard) {
+            console.log('Card não encontrado para atualização. ID procurado:', pokemonId);
+            return false;
+        }
+        
+        // Get updated data from form
+        const nickname = formData.get('nickname');
+        const level_caught = formData.get('level_caught');
+        const notes = formData.get('notes');
+        
+        // Update the card content
+        const nameElement = targetCard.querySelector('.pokemon-name');
+        const levelElement = targetCard.querySelector('.pokemon-level');
+        
+        if (nameElement) {
+            // If nickname exists, show it, otherwise show the original pokemon name
+            if (nickname && nickname.trim() !== '') {
+                nameElement.textContent = nickname;
+                
+                // Add or update species name if nickname exists
+                let speciesElement = targetCard.querySelector('.pokemon-species');
+                if (!speciesElement) {
+                    speciesElement = document.createElement('p');
+                    speciesElement.className = 'pokemon-species';
+                    nameElement.parentNode.insertBefore(speciesElement, nameElement.nextSibling);
+                }
+                
+                // Get original pokemon name from card data
+                const originalName = targetCard.dataset.name;
+                speciesElement.textContent = capitalizeFirstLetter(originalName);
+            } else {
+                // Remove nickname, show original name
+                const originalName = targetCard.dataset.name;
+                nameElement.textContent = capitalizeFirstLetter(originalName);
+                
+                // Remove species element if it exists
+                const speciesElement = targetCard.querySelector('.pokemon-species');
+                if (speciesElement) {
+                    speciesElement.remove();
+                }
+            }
+        }
+        
+        if (levelElement) {
+            levelElement.textContent = `Level ${level_caught}`;
+        }
+        
+        // Update or add/remove notes
+        let notesElement = targetCard.querySelector('.pokemon-notes');
+        if (notes && notes.trim() !== '') {
+            if (!notesElement) {
+                // Create notes element if it doesn't exist
+                notesElement = document.createElement('div');
+                notesElement.className = 'pokemon-notes';
+                
+                // Insert after the date element
+                const dateElement = targetCard.querySelector('.pokemon-date');
+                if (dateElement) {
+                    dateElement.parentNode.insertBefore(notesElement, dateElement.nextSibling);
+                } else {
+                    // Fallback: add to the end of pokemon-info
+                    const infoElement = targetCard.querySelector('.pokemon-info');
+                    infoElement.appendChild(notesElement);
+                }
+            }
+            notesElement.innerHTML = `<strong>Anotações:</strong> ${notes}`;
+        } else {
+            // Remove notes element if notes are empty
+            if (notesElement) {
+                notesElement.remove();
+            }
+        }
+        
+        console.log('Card atualizado com sucesso!');
+        return true;
+        
+    } catch (error) {
+        console.error('Erro na atualização dinâmica do Pokémon:', error);
+        return false;
+    }
+}
+
 // Delete Pokemon
 async function deletePokemon() {
     const pokemonId = document.getElementById('edit-id').value;
+    
+    console.log('Deletando Pokémon ID:', pokemonId);
     
     const formData = new FormData();
     formData.append('action', 'delete');
@@ -301,19 +592,118 @@ async function deletePokemon() {
             body: formData
         });
         
-        const data = await response.json();
+        console.log('Delete response status:', response.status);
+        const responseText = await response.text();
+        console.log('Delete response text:', responseText);
+        
+        const data = JSON.parse(responseText);
+        console.log('Delete parsed response:', data);
         
         if (data.success) {
             showAlert(data.message, 'success');
             document.getElementById('edit-pokemon-modal').style.display = 'none';
-            // Refresh the page to remove deleted Pokemon
-            setTimeout(() => location.reload(), 1500);
+            
+            console.log('Pokémon deletado com sucesso!');
+            
+            // Try dynamic removal first, then fallback to reload
+            const dynamicRemovalSuccess = removePokemonFromDOMDynamically(pokemonId);
+            
+            if (!dynamicRemovalSuccess) {
+                console.log('Remoção dinâmica falhou, recarregando página...');
+                setTimeout(() => {
+                    console.log('Recarregando página...');
+                    window.location.reload(true);
+                }, 1500);
+            } else {
+                console.log('Pokémon removido dinamicamente da página!');
+            }
         } else {
             showAlert(data.message, 'error');
+            console.error('Erro do servidor:', data.message);
         }
     } catch (error) {
         showAlert('Ocorreu um erro. Tente novamente.', 'error');
         console.error('Delete Pokemon error:', error);
+    }
+}
+
+// Remove Pokemon from DOM dynamically
+function removePokemonFromDOMDynamically(pokemonId) {
+    try {
+        console.log('Tentando remover Pokémon do DOM. ID:', pokemonId);
+        
+        // Find the Pokemon card by the data-id in the edit button
+        const pokemonCards = document.querySelectorAll('.pokemon-card');
+        let targetCard = null;
+        
+        pokemonCards.forEach(card => {
+            const editButton = card.querySelector('.edit-pokemon-btn');
+            if (editButton && editButton.dataset.id === pokemonId.toString()) {
+                targetCard = card;
+                console.log('Card encontrado para remoção:', card);
+            }
+        });
+        
+        if (!targetCard) {
+            console.log('Card não encontrado para remoção. ID procurado:', pokemonId);
+            return false;
+        }
+        
+        // Remove the card with animation
+        targetCard.style.transition = 'all 0.3s ease';
+        targetCard.style.opacity = '0';
+        targetCard.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+            targetCard.remove();
+            
+            // Check if collection is now empty
+            const remainingCards = document.querySelectorAll('.pokemon-card');
+            if (remainingCards.length === 0) {
+                // Show empty collection message
+                const pokemonGrid = document.getElementById('pokemon-grid');
+                const main = document.querySelector('.pokemon-collection');
+                
+                if (pokemonGrid) {
+                    pokemonGrid.style.display = 'none';
+                }
+                
+                const emptyMessage = `
+                    <div class="empty-collection">
+                        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/54.png" alt="Psyduck" class="empty-pokemon">
+                        <h3>Sua coleção está vazia!</h3>
+                        <p>Comece adicionando seu primeiro Pokémon à coleção.</p>
+                    </div>
+                `;
+                
+                main.innerHTML = emptyMessage;
+            }
+            
+            // Update stats
+            updateStatsAfterRemove();
+        }, 300);
+        
+        console.log('Card removido com sucesso!');
+        return true;
+        
+    } catch (error) {
+        console.error('Erro na remoção dinâmica do Pokémon:', error);
+        return false;
+    }
+}
+
+// Update stats after removing Pokemon
+function updateStatsAfterRemove() {
+    try {
+        const totalStat = document.querySelector('.stat-card:first-child .stat-number');
+        if (totalStat) {
+            const currentTotal = parseInt(totalStat.textContent) || 0;
+            if (currentTotal > 0) {
+                totalStat.textContent = currentTotal - 1;
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar estatísticas:', error);
     }
 }
 

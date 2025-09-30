@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Validation
     if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
-        $error_message = 'Por favor, preencha todos os campos.';
+        $error_message = 'Por favor, preencha todos os campos obrigatórios.';
     } elseif (!validateEmail($email)) {
         $error_message = 'Por favor, insira um endereço de e-mail válido.';
     } elseif (strlen($username) < 3) {
@@ -82,27 +82,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             <?php endif; ?>
 
-            <form class="auth-form" method="POST" action="">
+            <form class="auth-form" method="POST" action="" autocomplete="off">
                 <div class="form-group">
                     <label for="username">Nome de Usuário</label>
-                    <input type="text" id="username" name="username" value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" required>
+                    <input type="text" id="username" name="username" autocomplete="off" value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" required>
                     <small class="form-help">Pelo menos 3 caracteres</small>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+                    <input type="email" id="email" name="email" autocomplete="off" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Senha</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password" autocomplete="off" required>
                     <small class="form-help">Pelo menos 6 caracteres</small>
                 </div>
 
                 <div class="form-group">
                     <label for="confirm_password">Confirmar Senha</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required>
+                    <input type="password" id="confirm_password" name="confirm_password" autocomplete="off" required>
                 </div>
 
                 <button type="submit" class="btn btn-primary btn-full">Registrar</button>

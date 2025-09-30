@@ -500,7 +500,22 @@ h3 { font-size: 1.5rem; }
 .pokemon-date {
     color: #999;
     font-size: 0.875rem;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
+}
+
+.pokemon-notes {
+    background: #f8f9fa;
+    border-left: 3px solid #007bff;
+    padding: 8px 12px;
+    margin: 8px 0;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.pokemon-notes strong {
+    color: #007bff;
+    margin-right: 5px;
 }
 
 .pokemon-actions {
