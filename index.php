@@ -18,6 +18,22 @@ if (isLoggedIn()) {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body class="landing-page">
+    <!-- Header de Navegação -->
+    <header class="top-navigation">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png" alt="Logo" class="nav-logo-small">
+                    <span class="logo-text">PokéManager</span>
+                </div>
+                <nav class="nav-links">
+                    <a href="login.php" class="nav-link">Entrar</a>
+                    <a href="register.php" class="nav-link nav-link-primary">Criar Conta</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
         <header class="hero-section">
             <div class="hero-content">
@@ -58,8 +74,11 @@ if (isLoggedIn()) {
                 <h2>Comece sua Jornada</h2>
                 <p>Junte-se a milhares de treinadores gerenciando suas coleções de Pokémon</p>
                 <div class="cta-buttons">
-                    <a href="login.php" class="btn btn-primary">Entrar</a>
-                    <a href="register.php" class="btn btn-secondary">Registrar</a>
+                    <a href="register.php" class="btn btn-primary btn-cta">Criar Minha Conta</a>
+                    <a href="login.php" class="btn btn-outline btn-cta">Já Tenho Conta</a>
+                </div>
+                <div class="cta-subtext">
+                    <p><small>🎆 Grátis para sempre • 🔒 100% Seguro • ⚡ Acesso Instantâneo</small></p>
                 </div>
             </div>
         </main>

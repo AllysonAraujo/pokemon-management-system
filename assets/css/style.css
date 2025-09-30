@@ -98,6 +98,76 @@ h3 { font-size: 1.5rem; }
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+/* Top Navigation */
+.top-navigation {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 1rem 0;
+}
+
+.nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.nav-logo-small {
+    width: 32px;
+    height: 32px;
+}
+
+.logo-text {
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #333;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.nav-link-primary {
+    background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+    color: white !important;
+    font-weight: 600;
+}
+
+.nav-link-primary:hover {
+    background: linear-gradient(45deg, #FF5252, #FF7043);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
 .hero-section {
     text-align: center;
     padding: 60px 0;
@@ -177,6 +247,51 @@ h3 { font-size: 1.5rem; }
     justify-content: center;
     flex-wrap: wrap;
     margin-top: 30px;
+}
+
+.btn-cta {
+    font-size: 1.1rem;
+    padding: 16px 32px;
+    min-width: 180px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.btn-cta.btn-primary {
+    background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+    animation: pulse-glow 2s infinite;
+}
+
+.btn-cta.btn-outline {
+    border: 2px solid rgba(255,255,255,0.8);
+    color: white;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.btn-cta.btn-outline:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: white;
+}
+
+.cta-subtext {
+    margin-top: 20px;
+    opacity: 0.9;
+}
+
+.cta-subtext small {
+    font-size: 0.9rem;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); }
+    50% { box-shadow: 0 4px 25px rgba(255, 107, 107, 0.6); }
 }
 
 .footer {
@@ -281,10 +396,49 @@ h3 { font-size: 1.5rem; }
 .auth-links a {
     color: #FF6B6B;
     text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .auth-links a:hover {
     text-decoration: underline;
+}
+
+.auth-link-primary {
+    background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+    position: relative;
+}
+
+.auth-link-primary:hover {
+    transform: translateY(-1px);
+    text-decoration: none !important;
+}
+
+.auth-link-primary::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+    transition: width 0.3s ease;
+}
+
+.auth-link-primary:hover::after {
+    width: 100%;
+}
+
+.auth-link-back {
+    color: #888 !important;
+    font-size: 0.9rem;
+}
+
+.auth-link-back:hover {
+    color: #666 !important;
 }
 
 /* Alerts */
@@ -687,5 +841,42 @@ h3 { font-size: 1.5rem; }
     .auth-pokemon {
         width: 100px;
         height: 100px;
+    }
+    
+    .top-navigation {
+        padding: 0.75rem 0;
+    }
+    
+    .nav-wrapper {
+        padding: 0 1rem;
+    }
+    
+    .nav-links {
+        gap: 0.5rem;
+    }
+    
+    .nav-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .btn-cta {
+        width: 100%;
+        max-width: 280px;
+    }
+    
+    .logo-text {
+        font-size: 1.1rem;
+    }
+    
+    .nav-logo-small {
+        width: 28px;
+        height: 28px;
     }
 }

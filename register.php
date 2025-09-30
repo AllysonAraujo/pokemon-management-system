@@ -105,12 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <input type="password" id="confirm_password" name="confirm_password" autocomplete="off" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-full">Registrar</button>
+                <button type="submit" class="btn btn-primary btn-full">Criar Minha Conta</button>
             </form>
 
             <div class="auth-links">
-                <p>Já tem uma conta? <a href="login.php">Entre aqui</a></p>
-                <p><a href="index.php">← Voltar ao Início</a></p>
+                <p>Já tem uma conta? <a href="login.php" class="auth-link-primary">Entrar agora</a></p>
+                <p><a href="index.php" class="auth-link-back">← Voltar ao Início</a></p>
             </div>
         </div>
     </div>

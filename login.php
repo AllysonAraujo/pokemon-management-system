@@ -99,8 +99,8 @@ if (isset($_SESSION['registration_success'])) {
             </form>
 
             <div class="auth-links">
-                <p>Não tem uma conta? <a href="register.php">Registre-se aqui</a></p>
-                <p><a href="index.php">← Voltar ao Início</a></p>
+                <p>Não tem uma conta? <a href="register.php" class="auth-link-primary">Criar conta grátis</a></p>
+                <p><a href="index.php" class="auth-link-back">← Voltar ao Início</a></p>
             </div>
         </div>
     </div>
